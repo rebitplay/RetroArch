@@ -1036,3 +1036,5 @@ frontend_ctx_driver_t frontend_ctx_emscripten = {
    "emscripten",                        /* ident               */
    NULL                                 /* get_video_driver    */
 };
+
+#include "platform_emscripten_extend.c"

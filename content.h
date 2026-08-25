@@ -63,6 +63,9 @@ bool content_ram_state_pending(void);
 /* Gets the number of bytes required to serialize the state. */
 size_t content_get_serialized_size(void);
 
+/* Serializes the current state into a newly allocated buffer. Caller frees it. */
+void *content_export_state(size_t *serialized_size);
+
 /* Gets the number of bytes required to serialize the state for rewind. */
 size_t content_get_serialized_size_rewind(void);
 

@@ -469,7 +469,7 @@ bool content_serialize_state_rewind(void* buffer, size_t buffer_size)
    return content_write_serialized_state(buffer, &size, true);
 }
 
-static void *content_get_serialized_data(size_t *serial_size)
+void *content_export_state(size_t *serial_size)
 {
    size_t _len;
    void* data;
@@ -525,7 +525,7 @@ static void task_save_handler(retro_task_t *task)
    if (!state->data)
    {
       size_t _len = 0;
-      state->data = content_get_serialized_data(&_len);
+      state->data = content_export_state(&_len);
       state->size = (ssize_t)_len;
    }
 
@@ -1345,7 +1345,7 @@ bool content_auto_save_state(const char *path)
    if (_len == 0)
       return false;
 
-   serial_data = content_get_serialized_data(&_len);
+   serial_data = content_export_state(&_len);
    if (!serial_data)
       return false;
 
@@ -1416,7 +1416,7 @@ bool content_save_state(const char *path, bool save_to_disk)
 
    if (!save_state_in_background)
    {
-      if (!(data = content_get_serialized_data(&_len)))
+      if (!(data = content_export_state(&_len)))
       {
          RARCH_ERR("[State] %s \"%s\".\n",
                msg_hash_to_str(MSG_FAILED_TO_SAVE_STATE_TO),
@@ -1449,7 +1449,7 @@ bool content_save_state(const char *path, bool save_to_disk)
    {
       if (!data)
       {
-         if (!(data = content_get_serialized_data(&_len)))
+         if (!(data = content_export_state(&_len)))
          {
             RARCH_ERR("[State] %s \"%s\".\n",
                   msg_hash_to_str(MSG_FAILED_TO_SAVE_STATE_TO),
@@ -1741,7 +1741,7 @@ bool content_save_state_to_ram(void)
 
    if (!save_state_in_background)
    {
-      if (!(data = content_get_serialized_data(&_len)))
+      if (!(data = content_export_state(&_len)))
       {
          RARCH_ERR("[State] %s.\n",
                msg_hash_to_str(MSG_FAILED_TO_SAVE_SRAM));
@@ -1756,7 +1756,7 @@ bool content_save_state_to_ram(void)
 
    if (!data)
    {
-      if (!(data = content_get_serialized_data(&_len)))
+      if (!(data = content_export_state(&_len)))
       {
          RARCH_ERR("[State] %s.\n",
                msg_hash_to_str(MSG_FAILED_TO_SAVE_SRAM));

@@ -17,6 +17,27 @@
 #include <stdlib.h>
 #include <math.h>
 
+#ifdef EMSCRIPTEN
+#include <emscripten/emscripten.h>
+
+/* Deliver libretro pixels synchronously, before scaling, filtering or shaders.
+ * The core owns this memory: consumers must copy it before returning. */
+static int rebit_video_capture_enabled;
+
+EMSCRIPTEN_KEEPALIVE
+int rebit_set_video_capture_enabled(int enabled)
+{
+   rebit_video_capture_enabled = enabled != 0;
+   return 1; /* raw video callback ABI */
+}
+
+EM_JS(void, rebit_deliver_video_frame,
+      (const void *data, unsigned width, unsigned height, size_t pitch, unsigned format), {
+   var callback = Module["rebitOnVideoFrame"];
+   if (callback) callback(HEAPU8, data, width, height, pitch, format);
+});
+#endif
+
 #include <retro_inline.h>
 #include <string/stdstring.h>
 #include <retro_math.h>
@@ -3831,6 +3852,11 @@ void video_driver_frame(const void *data, unsigned width,
 
    status_text[0]                 = '\0';
    video_driver_msg[0]            = '\0';
+
+#ifdef EMSCRIPTEN
+   if (rebit_video_capture_enabled)
+      rebit_deliver_video_frame(data, width, height, pitch, video_driver_pix_fmt);
+#endif
 
    if (!video_driver_active)
       return;

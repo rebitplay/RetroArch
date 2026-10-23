@@ -1,10 +1,9 @@
 # Download translations from Crowdin and push to GitHub
 
-name: Crowdin Daily Workflow
+name: Crowdin Translation Sync
 
 on:
-  schedule:
-    - cron: '0 0 * * *'  # every day at midnight
+  workflow_dispatch:
 
 permissions:
   contents: read
